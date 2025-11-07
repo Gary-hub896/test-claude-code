@@ -307,16 +307,20 @@ GET  /api/sessions/{id}    // 恢复会话
 - 提供从断点继续的功能
 
 #### ⚠️ 3. 安全性增强
-**当前配置**：
+**当前问题**：
 ```python
-# settings.py 中硬编码了数据库密码
-DB_PASSWORD = "P@sschenggao!"
+# ⚠️ 发现安全隐患：敏感信息硬编码
+# - 数据库密码直接写在配置文件中
+# - API 密钥存储在代码仓库中
+# - 数据库连接信息未加密
 ```
 
 **建议**：
 ```python
 # 使用环境变量
 DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_USER = os.getenv("DB_USER")
 
 # 或使用密钥管理服务
 # AWS Secrets Manager, Azure Key Vault 等
@@ -531,7 +535,7 @@ services:
     image: postgres:15
     environment:
       POSTGRES_DB: esg_results
-      POSTGRES_USER: chenggao
+      POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
